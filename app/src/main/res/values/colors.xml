@@ -1,0 +1,12 @@
+<resources>
+    <color name="ic_launcher_background">#FFFFFFFF</color>
+    <color name="ink">#000000</color>
+    <color name="muted">#000000</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="card">#FFFFFF</color>
+    <color name="accent">#000000</color>
+    <color name="accent_soft">#FFFFFF</color>
+    <color name="divider">#000000</color>
+    <color name="success">#000000</color>
+    <color name="danger">#000000</color>
+</resources>

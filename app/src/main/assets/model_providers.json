@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "providers": [
+    {
+      "id": "pocket-tts",
+      "class": "com.example.yapit.provider.PocketTtsProvider",
+      "enabled": true,
+      "config": {
+        "asset_directory": "models/pocket-tts-int8-2026-01-26",
+        "num_threads": 2,
+        "steps": 5,
+        "models": [
+          {
+            "id": "pocket-tts-int8-en",
+            "display_name": "Pocket TTS · Voice cloning",
+            "version": "2026-01-26-int8",
+            "description": "Clones the selected voice sample in English, entirely on this device. First use prepares the bundled model.",
+            "capabilities": ["TEXT_TO_SPEECH", "VOICE_CLONING", "VOICE_ENROLLMENT", "OFFLINE"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "android-system",
+      "class": "com.example.yapit.provider.AndroidSystemTtsProvider",
+      "enabled": true,
+      "config": {
+        "models": [
+          {
+            "id": "device-default",
+            "display_name": "default [agent voice]",
+            "version": "system",
+            "description": "Uses the Android TTS engine. It does not clone the enrolled voice.",
+            "capabilities": ["TEXT_TO_SPEECH", "OFFLINE"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "rest-voice-clone",
+      "class": "com.example.yapit.provider.RestVoiceCloneProvider",
+      "enabled": true,
+      "config": {
+        "base_url": "${VOICE_API_BASE_URL}",
+        "api_key": "${VOICE_API_KEY}",
+        "connect_timeout_seconds": 30,
+        "read_timeout_seconds": 600,
+        "models": [
+          {
+            "id": "default-clone",
+            "display_name": "Voice Clone API",
+            "version": "1",
+            "description": "Configurable REST voice-cloning adapter.",
+            "capabilities": ["TEXT_TO_SPEECH", "VOICE_CLONING", "VOICE_ENROLLMENT", "REQUIRES_NETWORK"]
+          }
+        ]
+      }
+    }
+  ]
+}

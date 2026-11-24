@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">YapIt</string>
+    <string name="profiles_tab">Profiles</string>
+    <string name="generation_loading">Generating speech</string>
+    <string name="select_voice_profile">Select voice profile</string>
+    <string name="add_voice_profile">Add voice profile</string>
+    <string name="profile_name">Profile name</string>
+    <string name="add">Add</string>
+    <string name="delete">Delete</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="play_sample">Play sample</string>
+    <string name="pause_sample">Pause sample</string>
+    <string name="retake_sample">Retake voice sample</string>
+    <string name="record_sample">Record voice sample</string>
+    <string name="recording_stop">Recording… tap to stop</string>
+    <string name="share">Share</string>
+    <string name="open_in_folder">Open in folder</string>
+    <string name="generation_text">Generation text</string>
+    <string name="view_generation_text">View full text</string>
+    <string name="copy_text">Copy text</string>
+    <string name="close">Close</string>
+    <string name="delete_generated_audio">Delete generated audio?</string>
+    <string name="delete_generated_audio_message">Remove this audio and its history from YapIt and Downloads/YapIt? The voice profile and reference sample will be kept.</string>
+    <string name="notification_channel_name">Voice generation</string>
+</resources>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootLayout"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@color/surface"
+    android:paddingStart="20dp" android:paddingEnd="20dp">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:gravity="center_vertical" android:paddingTop="18dp" android:paddingBottom="14dp">
+        <ImageView android:layout_width="32dp" android:layout_height="32dp" android:src="@mipmap/ic_launcher" android:contentDescription="@string/app_name"/>
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="@string/app_name" android:textColor="@color/ink" android:textSize="22sp" android:textStyle="bold" android:paddingStart="10dp"/>
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/tabBar" android:layout_width="match_parent" android:layout_height="48dp"
+        android:orientation="horizontal" android:background="@drawable/bg_tabs" android:padding="4dp">
+        <TextView android:id="@+id/tabProfiles" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
+            android:gravity="center" android:text="@string/profiles_tab" android:textStyle="bold" android:textColor="@color/ink"/>
+        <TextView android:id="@+id/tabGenerate" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
+            android:gravity="center" android:text="Create" android:textStyle="bold" android:textColor="@color/surface" android:background="@drawable/bg_tab_selected"/>
+        <TextView android:id="@+id/tabGenerated" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
+            android:gravity="center" android:text="Generated" android:textStyle="bold" android:textColor="@color/muted"/>
+    </LinearLayout>
+
+    <ScrollView android:id="@+id/profilesPanel" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true" android:visibility="gone">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingTop="18dp" android:paddingBottom="24dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/bg_card" android:padding="18dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Your voice profile" android:textColor="@color/ink" android:textSize="17sp" android:textStyle="bold"/>
+                <Spinner android:id="@+id/profileSpinner" android:layout_width="match_parent" android:layout_height="56dp" android:layout_marginTop="12dp" android:background="@drawable/bg_card" android:paddingStart="14dp" android:paddingEnd="14dp" android:contentDescription="@string/select_voice_profile"/>
+                <com.google.android.material.button.MaterialButton android:id="@+id/addProfileButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/add_voice_profile" app:cornerRadius="14dp"/>
+                <TextView android:id="@+id/profileStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="No sample recorded" android:textColor="@color/muted" android:textSize="14sp" android:paddingTop="6dp"/>
+                <com.google.android.material.button.MaterialButton android:id="@+id/playSampleButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="@string/play_sample" android:enabled="false" app:cornerRadius="14dp" app:icon="@drawable/ic_play"/>
+                <com.google.android.material.button.MaterialButton android:id="@+id/recordButton" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="Record voice sample" app:cornerRadius="14dp" app:icon="@drawable/ic_wave"/>
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Read naturally for 10–30 seconds in a quiet room." android:textColor="@color/muted" android:textSize="12sp" android:paddingTop="8dp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <ScrollView android:id="@+id/createPanel" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingTop="18dp" android:paddingBottom="24dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/select_voice_profile" android:textColor="@color/ink" android:textSize="12sp" android:textStyle="bold" android:layout_marginBottom="8dp"/>
+            <Spinner android:id="@+id/generationProfileSpinner" android:layout_width="match_parent" android:layout_height="56dp" android:background="@drawable/bg_card" android:paddingStart="14dp" android:paddingEnd="14dp" android:contentDescription="@string/select_voice_profile"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="MODEL" android:textColor="@color/muted" android:textSize="12sp" android:textStyle="bold" android:layout_marginTop="22dp" android:layout_marginBottom="8dp"/>
+            <Spinner android:id="@+id/modelSpinner" android:layout_width="match_parent" android:layout_height="56dp" android:background="@drawable/bg_card" android:paddingStart="14dp" android:paddingEnd="14dp"/>
+            <TextView android:id="@+id/modelCapabilities" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/muted" android:textSize="12sp" android:paddingTop="7dp"/>
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="TEXT" android:textColor="@color/muted" android:textSize="12sp" android:textStyle="bold" android:layout_marginTop="20dp" android:layout_marginBottom="8dp"/>
+            <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" app:boxBackgroundMode="outline" app:boxCornerRadiusTopStart="18dp" app:boxCornerRadiusTopEnd="18dp" app:boxCornerRadiusBottomStart="18dp" app:boxCornerRadiusBottomEnd="18dp" app:counterEnabled="true" app:counterMaxLength="2000">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/textInput" android:layout_width="match_parent" android:layout_height="180dp" android:gravity="top|start" android:hint="Type what you want to hear…" android:textColor="@color/ink" android:textColorHint="@color/ink" android:inputType="textMultiLine|textCapSentences" android:maxLength="2000" android:scrollbars="vertical" android:overScrollMode="ifContentScrolls" android:padding="16dp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.button.MaterialButton android:id="@+id/generateButton" android:layout_width="match_parent" android:layout_height="56dp" android:layout_marginTop="16dp" android:text="Generate" android:textSize="16sp" app:cornerRadius="16dp"/>
+        </LinearLayout>
+    </ScrollView>
+
+    <FrameLayout android:id="@+id/generatedPanel" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:visibility="gone">
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/generatedList" android:layout_width="match_parent" android:layout_height="match_parent" android:clipToPadding="false" android:paddingTop="14dp" android:paddingBottom="24dp"/>
+        <LinearLayout android:id="@+id/emptyState" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
+            <ImageView android:layout_width="44dp" android:layout_height="44dp" android:src="@drawable/ic_wave" android:contentDescription="No generations"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nothing generated yet" android:textColor="@color/muted" android:textSize="15sp" android:paddingTop="10dp"/>
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

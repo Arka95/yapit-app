@@ -1,0 +1,11 @@
+Pocket TTS voice-cloning model
+Original model: Kyutai (https://github.com/kyutai-labs/pocket-tts)
+ONNX export: KevinAHM (https://github.com/KevinAHM/pocket-tts-onnx-export)
+Distribution: k2-fsa/sherpa-onnx, pocket-tts-int8-2026-01-26
+Weights: Creative Commons Attribution 4.0 International.
+Original license and attribution accompany the unchanged model files under models.
+
+sherpa-onnx Android runtime 2.0.3
+https://github.com/k2-fsa/sherpa-onnx
+Apache License 2.0. See licenses/sherpa-onnx-LICENSE.txt.
+The AAR includes ONNX Runtime; its MIT license is in licenses/onnxruntime-LICENSE.txt.

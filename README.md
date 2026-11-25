@@ -10,7 +10,7 @@ A Java Android app for creating named voice profiles, cloning a selected voice o
 - Records mono, 16-kHz, 16-bit WAV audio as `<profile-name>.sample` in each profile's private folder.
 - Play or pause the selected profile's sample, or retake it. A retake replaces the saved sample only after a valid recording is completed.
 - The recording button shows a pulsing icon and a tap-to-stop label while recording.
-- Clones the selected voice in English with bundled Pocket TTS INT8, using sherpa-onnx on the device CPU.
+- Clones the selected voice in English with bundled October 2026 Pocket TTS, using full-precision ONNX models on the device CPU.
 - Discovers providers/models from `app/src/main/assets/model_providers.json`.
 - Persists the chosen provider, model ID, display-name snapshot, and version in every generation record.
 - Runs synthesis as unique WorkManager work, including foreground progress for long jobs.
@@ -25,19 +25,21 @@ A Java Android app for creating named voice profiles, cloning a selected voice o
 
 ## Important model behavior
 
-The default model is **Pocket TTS · Voice cloning**. Record 10–30 seconds of clear speech for a profile, select it, enter English text, and tap **Generate**. Inference is offline. The first generation copies the bundled model into app-private storage before loading it. Model weights use about 190 MiB, plus the bundled APK and runtime memory.
+The default model is **Pocket TTS · Voice cloning**. Record 10–30 seconds of clear speech for a profile, select it, enter English text, and tap **Generate**. Inference is offline. The first generation copies the bundled model into app-private storage before loading it. The model bundle uses about 419 MiB, plus the bundled APK and runtime memory.
 
-Pocket TTS model revision: `2026-01-26-int8`; sherpa-onnx runtime: `2.0.3`; device: ARM64 CPU; two inference threads and five sampling steps by default. These settings are owned by `model_providers.json`. Native resources are released after each generation. Voice profiles stay private; generated audio is also published to Downloads/YapIt for browsing and sharing.
+Pocket TTS model: `english_2026-10`, revision `db04f0e653473e5c7333c69686ac92b7460b0c1d`, exported from Pocket TTS 4.0.1 in float32; sherpa-onnx runtime: `2.0.3`; device: ARM64 CPU. Defaults are two inference threads, one sampling step, temperature 0.3, and a 12-second reference window. A disposable copy of the reference is faded into an 80 ms pause, preserving the original recording. Generated quiet intervals are retained at their original length.
+
+Generation settings are owned by `model_providers.json`. Native resources are released after each generation. Voice profiles stay private; generated audio is also published to Downloads/YapIt for browsing and sharing. See the [Pocket model guide](docs/pocket/dev.readme.md) for export, compatibility and validation details.
 
 The model selector also offers **default [agent voice]**, which uses Android system TTS without cloning the selected sample. The optional **Voice Clone API** adapter appears when `VOICE_API_BASE_URL` is configured.
 
-Before the first build, run this PowerShell command to download and verify the Android runtime and model:
+Before the first build, run this command in an existing CPU Python environment. It installs the export dependencies, restores the checksum-pinned Android runtime, and exports and verifies the pinned model:
 
 ```powershell
-.\scripts\setup-model.ps1
+.\scripts\setup-model.ps1 -Python python -InstallExportDependencies
 ```
 
-It restores the checksum-pinned AAR under `app\libs` and model weights under the Git-ignored `data\models`. Gradle bundles the required weights and their license in the APK. Subsequent builds reuse these downloads.
+The source model must be accessible through your local Hugging Face cache or account. Pass `-CacheDirectory` to reuse an existing hub cache. Exported weights stay under Git-ignored `data\models`; subsequent setup runs verify and reuse a complete bundle. Gradle bundles only the current model and its license in the APK.
 
 Set the REST provider at build time without committing a key:
 
@@ -121,7 +123,7 @@ files/
 │       ├── profile.json
 │       └── <profile-name>.sample
 ├── models/
-│   └── pocket-tts-int8-2026-01-26/
+│       └── pocket-tts-english-2026-10-fp32/
 └── generations/
     └── <generation-id>/
         ├── metadata.json
@@ -136,9 +138,9 @@ Minimizing the app keeps active generation running through WorkManager and its f
 
 ## Model attribution and testing
 
-Pocket TTS is by Kyutai, with the ONNX export distributed by the sherpa-onnx project. Model weights are licensed under CC BY 4.0; the model bundle retains its original `LICENSE` and `README.md`. The sherpa-onnx runtime is Apache-2.0 licensed; its license is bundled under `licenses`.
+Pocket TTS is by Kyutai. YapIt's export tooling adapts the public streaming-state export approach for the current model and sherpa-onnx graph interface. Model weights are licensed under CC BY 4.0; the bundle retains the license, attribution, checkpoint revision and artifact checksums. The sherpa-onnx runtime is Apache-2.0 licensed; its license is bundled under `licenses`. Export-tool attribution is retained in `scripts\licenses`.
 
-Run `.\gradlew.bat :app:testDebugUnitTest :app:lintDebug :app:assembleDebug` to test profile isolation, legacy recording migration, invalid-name handling and enrollment isolation, check Android compatibility, and build the APK. These unit tests use temporary files and do not load a model or use a microphone.
+Run `.\gradlew.bat :app:testDebugUnitTest :app:lintDebug :app:assembleDebug` to test profile isolation, legacy migration, enrollment isolation, reference-window trimming and text preparation, check Android compatibility, and build the APK. These unit tests use temporary files and synthetic arrays without loading a model or using a microphone.
 
 ## Security notes
 

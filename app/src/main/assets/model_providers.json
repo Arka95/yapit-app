@@ -6,15 +6,17 @@
       "class": "com.example.yapit.provider.PocketTtsProvider",
       "enabled": true,
       "config": {
-        "asset_directory": "models/pocket-tts-int8-2026-01-26",
+        "asset_directory": "models/pocket-tts-english-2026-10-fp32",
         "num_threads": 2,
-        "steps": 5,
+        "steps": 1,
+        "temperature": 0.3,
+        "reference_max_seconds": 12,
         "models": [
           {
-            "id": "pocket-tts-int8-en",
+            "id": "pocket-tts-en",
             "display_name": "Pocket TTS · Voice cloning",
-            "version": "2026-01-26-int8",
-            "description": "Clones the selected voice sample in English, entirely on this device. First use prepares the bundled model.",
+            "version": "english_2026-10-fp32",
+            "description": "October 2026 English voice cloning, full precision, entirely on this device. First use prepares the bundled model.",
             "capabilities": ["TEXT_TO_SPEECH", "VOICE_CLONING", "VOICE_ENROLLMENT", "OFFLINE"]
           }
         ]

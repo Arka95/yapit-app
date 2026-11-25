@@ -24,10 +24,10 @@ public final class PocketTtsProvider implements ModelProvider {
         progress.onStage(GenerationStatus.LOADING_MODEL, "Preparing offline voice-cloning model");
         File directory = prepareModel(context, config.getString("asset_directory"));
         OfflineTtsPocketModelConfig pocket = new OfflineTtsPocketModelConfig();
-        pocket.setLmFlow(new File(directory, "lm_flow.int8.onnx").getAbsolutePath());
-        pocket.setLmMain(new File(directory, "lm_main.int8.onnx").getAbsolutePath());
+        pocket.setLmFlow(new File(directory, "lm_flow.onnx").getAbsolutePath());
+        pocket.setLmMain(new File(directory, "lm_main.onnx").getAbsolutePath());
         pocket.setEncoder(new File(directory, "encoder.onnx").getAbsolutePath());
-        pocket.setDecoder(new File(directory, "decoder.int8.onnx").getAbsolutePath());
+        pocket.setDecoder(new File(directory, "decoder.onnx").getAbsolutePath());
         pocket.setTextConditioner(new File(directory, "text_conditioner.onnx").getAbsolutePath());
         pocket.setVocabJson(new File(directory, "vocab.json").getAbsolutePath());
         pocket.setTokenScoresJson(new File(directory, "token_scores.json").getAbsolutePath());
@@ -35,7 +35,15 @@ public final class PocketTtsProvider implements ModelProvider {
         modelConfig.setPocket(pocket); modelConfig.setNumThreads(config.optInt("num_threads", 2)); modelConfig.setProvider("cpu");
         OfflineTtsConfig ttsConfig = new OfflineTtsConfig(); ttsConfig.setModel(modelConfig);
         try {
-            return new Session(new OfflineTts(null, ttsConfig), new VoiceProfileStore(context), config.optInt("steps", 5));
+            int steps = config.optInt("steps", 1);
+            double temperature = config.optDouble("temperature", 0.3);
+            double referenceSeconds = config.optDouble("reference_max_seconds", 12);
+            if (steps < 1 || steps > 16 || !Double.isFinite(temperature) || temperature <= 0 || temperature > 2
+                    || !Double.isFinite(referenceSeconds) || referenceSeconds <= 0 || referenceSeconds > 30) {
+                throw new IOException("Invalid Pocket TTS generation settings");
+            }
+            return new Session(new OfflineTts(null, ttsConfig), new VoiceProfileStore(context),
+                    steps, temperature, referenceSeconds);
         } catch (LinkageError error) {
             throw new IOException("The bundled voice-cloning runtime could not be loaded", error);
         }
@@ -60,22 +68,33 @@ public final class PocketTtsProvider implements ModelProvider {
         private final OfflineTts tts;
         private final VoiceProfileStore profiles;
         private final int steps;
-        Session(OfflineTts tts, VoiceProfileStore profiles, int steps) { this.tts = tts; this.profiles = profiles; this.steps = steps; }
+        private final double temperature;
+        private final double referenceSeconds;
+        Session(OfflineTts tts, VoiceProfileStore profiles, int steps, double temperature, double referenceSeconds) {
+            this.tts = tts; this.profiles = profiles; this.steps = steps;
+            this.temperature = temperature; this.referenceSeconds = referenceSeconds;
+        }
         @Override public EnrollmentResult enroll(VoiceProfile profile, File sample, ProgressSink progress) throws Exception {
             if (!sample.isFile()) throw new FileNotFoundException("Record a sample for " + profile.displayName);
             return new EnrollmentResult(profile.profileId);
         }
         @Override public GenerationResult generate(VoiceProfile profile, String enrollmentId, GenerationRecord request, File destination, ProgressSink progress) throws Exception {
             WaveData reference = WaveReader.Companion.readWave(profiles.sampleFile(profile).getAbsolutePath());
-            if (reference.getSamples().length == 0) throw new IOException("The selected voice sample contains no audio");
             GenerationConfig generation = new GenerationConfig();
-            generation.setReferenceAudio(reference.getSamples()); generation.setReferenceSampleRate(reference.getSampleRate());
-            generation.setNumSteps(steps); generation.setExtra(Map.of("max_reference_audio_len", "12"));
+            generation.setReferenceAudio(PocketAudioPreparation.reference(
+                    reference.getSamples(), reference.getSampleRate(), referenceSeconds));
+            generation.setReferenceSampleRate(reference.getSampleRate());
+            generation.setNumSteps(steps); generation.setSilenceScale(1f);
+            String text = PocketAudioPreparation.text(request.text);
+            generation.setExtra(Map.of("max_reference_audio_len", Double.toString(referenceSeconds + 0.1),
+                    "temperature", Double.toString(temperature),
+                    "frames_after_eos", text.split(" ").length <= 4 ? "3" : "1"));
             progress.onStage(GenerationStatus.GENERATING, "Cloning " + profile.displayName + " on device");
             GenerationCallback callback = new GenerationCallback(progress, profile.displayName);
-            GeneratedAudio audio = tts.generateWithConfigAndCallback(request.text, generation, callback);
+            GeneratedAudio audio = tts.generateWithConfigAndCallback(text, generation, callback);
             callback.throwIfFailed();
             progress.onStage(GenerationStatus.GENERATING, "Saving cloned speech");
+            PocketAudioPreparation.fadeOnset(audio.getSamples(), audio.getSampleRate());
             if (audio.getSamples().length == 0 || !audio.save(destination.getAbsolutePath())) throw new IOException("Voice cloning returned no audio");
             return new GenerationResult(destination, "audio/wav");
         }
